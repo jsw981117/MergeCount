@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <title>MergeCount - 머지 방치형 게임</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="gameContainer">
+    <!-- 상단 골드 표시 -->
+    <div id="topBar">
+      <div id="goldDisplay">
+        <span class="gold-icon">💰</span>
+        <span id="goldAmount">0</span>
+      </div>
+    </div>
+
+    <!-- 게임 캔버스 -->
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- 하단 버튼 -->
+    <div id="bottomBar">
+      <button id="gachaBtn" class="game-btn">
+        뽑기 (<span id="gachaCost">50</span>💰)
+      </button>
+      <button id="upgradeBtn" class="game-btn">
+        업그레이드
+      </button>
+    </div>
+
+    <!-- 업그레이드 메뉴 (팝업) -->
+    <div id="upgradeMenu" class="modal" style="display: none;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>업그레이드</h2>
+          <button id="closeUpgradeBtn" class="close-btn">✕</button>
+        </div>
+
+        <div class="upgrade-list">
+          <!-- 쿨타임 감소 -->
+          <div class="upgrade-item">
+            <div class="upgrade-info">
+              <h3>⏱️ 쿨타임 감소</h3>
+              <p>레벨: <span id="cooldownLevel">0</span></p>
+              <p class="upgrade-effect"><span id="cooldownEffect">-</span></p>
+            </div>
+            <button id="upgradeCooldown" class="upgrade-btn">
+              <span id="cooldownCost">100</span>💰
+            </button>
+          </div>
+
+          <!-- 수익 증가 -->
+          <div class="upgrade-item">
+            <div class="upgrade-info">
+              <h3>💵 수익 증가</h3>
+              <p>레벨: <span id="moneyLevel">0</span></p>
+              <p class="upgrade-effect"><span id="moneyEffect">-</span></p>
+            </div>
+            <button id="upgradeMoney" class="upgrade-btn">
+              <span id="moneyCost">150</span>💰
+            </button>
+          </div>
+
+          <!-- 뽑기 레벨 -->
+          <div class="upgrade-item">
+            <div class="upgrade-info">
+              <h3>🎲 뽑기 레벨</h3>
+              <p>레벨: <span id="gachaLevel">0</span></p>
+              <p class="upgrade-effect"><span id="gachaEffect">-</span></p>
+            </div>
+            <button id="upgradeGacha" class="upgrade-btn">
+              <span id="gachaCost">500</span>💰
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 게임 스크립트 -->
+  <script src="js/config.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/game.js"></script>
+  <script src="js/economy.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
