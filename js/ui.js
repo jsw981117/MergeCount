@@ -9,7 +9,10 @@ const UI = {
     dragging: false,
     objectId: null,
     offsetX: 0,
-    offsetY: 0
+    offsetY: 0,
+    lastX: 0,
+    lastY: 0,
+    lastTime: 0
   },
 
   // UI 모드
@@ -199,6 +202,14 @@ const UI = {
       this.dragState.objectId = obj.id;
       this.dragState.offsetX = pos.x - obj.x;
       this.dragState.offsetY = pos.y - obj.y;
+      this.dragState.lastX = pos.x;
+      this.dragState.lastY = pos.y;
+      this.dragState.lastTime = Date.now();
+
+      // 속도 초기화 + 슬립 해제
+      obj.vx = 0;
+      obj.vy = 0;
+      obj.sleeping = false;
     }
   },
 
@@ -219,6 +230,14 @@ const UI = {
 
       obj.x = Math.max(CONFIG.OBJECT_SIZE / 2, Math.min(CONFIG.CANVAS_WIDTH - CONFIG.OBJECT_SIZE / 2, obj.x));
       obj.y = Math.max(minY, Math.min(maxY, obj.y));
+
+      // 드래그 중 머지 체크
+      const target = Physics.checkDragCollision(obj);
+      if (target) {
+        Game.merge(obj, target);
+        this.dragState.dragging = false;
+        this.dragState.objectId = null;
+      }
     }
   },
 
@@ -228,9 +247,24 @@ const UI = {
 
     const obj = Game.state.objects.find(o => o.id === this.dragState.objectId);
     if (obj) {
-      const target = Game.findMergeTarget(obj);
-      if (target) {
-        Game.merge(obj, target);
+      // 속도 계산
+      const now = Date.now();
+      const dt = (now - this.dragState.lastTime) / 1000;
+      const pos = this.getMousePos(e);
+
+      if (dt > 0) {
+        const dx = pos.x - this.dragState.lastX;
+        const dy = pos.y - this.dragState.lastY;
+
+        obj.vx = dx / dt;
+        obj.vy = dy / dt;
+
+        // 최대 속도 제한
+        const speed = Math.hypot(obj.vx, obj.vy);
+        if (speed > Physics.MAX_SPEED) {
+          obj.vx = (obj.vx / speed) * Physics.MAX_SPEED;
+          obj.vy = (obj.vy / speed) * Physics.MAX_SPEED;
+        }
       }
     }
 

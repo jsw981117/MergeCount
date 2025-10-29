@@ -3,6 +3,7 @@
 const Main = {
   lastTime: 0,
   running: false,
+  backgroundStartTime: null,
 
   // 게임 시작
   init() {
@@ -17,6 +18,28 @@ const Main = {
     canvas.width = CONFIG.CANVAS_WIDTH;
     canvas.height = CONFIG.CANVAS_HEIGHT;
     UI.init(canvas);
+
+    // Page Visibility API 리스너
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        // 백그라운드 진입
+        this.backgroundStartTime = Date.now();
+        console.log('백그라운드 진입');
+      } else {
+        // 포그라운드 복귀
+        if (this.backgroundStartTime) {
+          const elapsed = Date.now() - this.backgroundStartTime;
+          const income = Economy.calculateBackgroundIncome(elapsed);
+
+          if (income > 0) {
+            Game.addGold(income);
+            console.log(`백그라운드 수익: ${income} 골드 (${(elapsed/1000).toFixed(1)}초)`);
+          }
+
+          this.backgroundStartTime = null;
+        }
+      }
+    });
 
     // 게임 시작
     this.running = true;
@@ -47,6 +70,9 @@ const Main = {
   update(deltaTime) {
     // 자동 수익
     Economy.updateIncome();
+
+    // 물리 업데이트
+    Physics.update(deltaTime);
 
     // 게임 상태 업데이트
     Game.update(deltaTime);

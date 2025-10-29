@@ -7,7 +7,7 @@ const CONFIG = {
   GAME_AREA_HEIGHT: 1620, // 게임 영역 높이 (상단바 100px + 하단바 200px 제외)
 
   // 오브젝트 설정
-  OBJECT_SIZE: 80, // 오브젝트 크기
+  OBJECT_SIZE: 150, // 오브젝트 크기
 
   // 등급별 정보 (sides: 도형의 변 개수)
   TIERS: [
@@ -89,7 +89,7 @@ const Settings = {
     tierMultiplier: 2,       // 등급당 수익 배율
     baseCooldown: 2000,      // 기본 쿨타임 (ms)
     gachaCost: 50,           // 뽑기 비용
-    objectSize: 80,          // 오브젝트 크기
+    objectSize: 150,         // 오브젝트 크기
     upgradeCostMultiplier: 1.5, // 업그레이드 비용 배율
     textScale: 1.0           // 텍스트 크기 배율 (0.5 ~ 2.0)
   },
@@ -149,7 +149,7 @@ const Settings = {
       tierMultiplier: 2,
       baseCooldown: 2000,
       gachaCost: 50,
-      objectSize: 80,
+      objectSize: 150,
       upgradeCostMultiplier: 1.5,
       textScale: 1.0
     };

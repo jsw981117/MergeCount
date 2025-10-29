@@ -23,6 +23,26 @@ const Economy = {
     }
   },
 
+  // 백그라운드 수익 계산 (탭 이동 시)
+  calculateBackgroundIncome(elapsedTime) {
+    const cooldown = this.getCooldown();
+    const moneyMultiplier = this.getMoneyMultiplier();
+
+    let totalIncome = 0;
+
+    Game.state.objects.forEach(obj => {
+      // 경과 시간 동안 몇 번 수익 발생했는지 계산
+      const incomeCount = Math.floor(elapsedTime / cooldown);
+      const income = this.calculateIncome(obj.tier, moneyMultiplier);
+      totalIncome += income * incomeCount;
+
+      // lastIncome 시간 업데이트
+      obj.lastIncome = Date.now();
+    });
+
+    return totalIncome;
+  },
+
   // 오브젝트별 수익 계산
   calculateIncome(tier, moneyMultiplier) {
     const baseIncome = CONFIG.INCOME.BASE_AMOUNT * Math.pow(CONFIG.INCOME.TIER_MULTIPLIER, tier);

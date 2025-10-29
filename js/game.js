@@ -52,6 +52,9 @@ const Game = {
       tier: tier,
       x: x,
       y: y,
+      vx: 0,           // 속도 X
+      vy: 0,           // 속도 Y
+      sleeping: false, // 정지 상태
       lastIncome: Date.now()
     };
 
