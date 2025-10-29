@@ -6,6 +6,9 @@ const Main = {
 
   // 게임 시작
   init() {
+    // 설정 로드 (게임보다 먼저!)
+    Settings.load();
+
     // 게임 초기화
     Game.init();
 

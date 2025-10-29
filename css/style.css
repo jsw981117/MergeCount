@@ -7,91 +7,159 @@
 
 body {
   font-family: 'Arial', sans-serif;
-  background-color: #1a1a1a;
+  background-color: #0a0a0a;
   color: #fff;
   overflow: hidden;
   user-select: none;
   -webkit-user-select: none;
   -webkit-touch-callout: none;
-}
-
-#gameContainer {
+  width: 100vw;
+  height: 100vh;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 100vh;
-  padding: 10px;
 }
 
-/* 상단 골드 바 */
-#topBar {
+/* 게임 컨테이너 (화면 전체) */
+#gameContainer {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle, #1a1a1a 0%, #0a0a0a 100%);
+}
+
+/* 게임 박스 (고정 비율 1080x1920 유지) */
+#gameBox {
+  position: relative;
+  width: 1080px;
+  height: 1920px;
+  max-width: 100vw;
+  max-height: 100vh;
+  background: #000;
+  box-shadow: 0 0 50px rgba(0, 0, 0, 0.8);
+  overflow: hidden;
+}
+
+/* 비율 유지 스케일링 */
+@media (max-aspect-ratio: 1080/1920) {
+  /* 화면이 더 좁을 때 (대부분의 모바일) - 가로 기준 */
+  #gameBox {
+    width: 100vw;
+    height: calc(100vw * 1920 / 1080);
+  }
+}
+
+@media (min-aspect-ratio: 1080/1920) {
+  /* 화면이 더 넓을 때 (태블릿, 데스크톱) - 세로 기준 */
+  #gameBox {
+    width: calc(100vh * 1080 / 1920);
+    height: 100vh;
+  }
+}
+
+/* 캔버스 (절대 위치로 배치) */
+#gameCanvas {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
-  max-width: 800px;
-  padding: 15px 20px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 10px 10px 0 0;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  height: 100%;
+  touch-action: none;
+  cursor: pointer;
+}
+
+/* 상단바 */
+#topBar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 30px;
+  z-index: 10;
+  pointer-events: none;
 }
 
 #goldDisplay {
-  font-size: 24px;
+  font-size: 48px;
   font-weight: bold;
-  text-align: center;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.8);
+  color: #FFD700;
+  pointer-events: none;
 }
 
 .gold-icon {
-  margin-right: 5px;
+  margin-right: 10px;
 }
 
-/* 캔버스 */
-#gameCanvas {
-  display: block;
-  background-color: #2C3E50;
-  border-left: 3px solid #667eea;
-  border-right: 3px solid #667eea;
+/* 설정 버튼 (아이콘) */
+.icon-btn {
+  font-size: 48px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  width: 80px;
+  height: 80px;
   cursor: pointer;
-  touch-action: none;
-  max-width: 100%;
-  height: auto;
+  transition: all 0.3s ease;
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* 하단 버튼 바 */
+.icon-btn:hover {
+  background: rgba(0, 0, 0, 0.8);
+  border-color: #667eea;
+  transform: scale(1.1);
+}
+
+.icon-btn:active {
+  transform: scale(0.95);
+}
+
+/* 하단바 */
 #bottomBar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
   width: 100%;
-  max-width: 800px;
-  padding: 15px 20px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 0 0 10px 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  height: 200px;
   display: flex;
-  gap: 10px;
+  gap: 20px;
   justify-content: space-around;
+  align-items: center;
+  padding: 20px 30px;
+  z-index: 10;
 }
 
 .game-btn {
   flex: 1;
-  padding: 15px 20px;
-  font-size: 18px;
+  padding: 30px;
+  font-size: 36px;
   font-weight: bold;
   color: #fff;
   background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
   border: none;
-  border-radius: 8px;
+  border-radius: 20px;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
 }
 
 .game-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.5);
 }
 
 .game-btn:active {
   transform: translateY(0);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
 }
 
 /* 모달 (팝업) */
@@ -99,9 +167,9 @@ body {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.8);
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.85);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -110,38 +178,39 @@ body {
 
 .modal-content {
   background: linear-gradient(135deg, #2C3E50 0%, #34495E 100%);
-  padding: 30px;
-  border-radius: 15px;
-  max-width: 500px;
+  padding: 40px;
+  border-radius: 30px;
+  max-width: 800px;
   width: 90%;
   max-height: 80vh;
   overflow-y: auto;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
 }
 
 .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
-  padding-bottom: 15px;
-  border-bottom: 2px solid #667eea;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 3px solid #667eea;
 }
 
 .modal-header h2 {
   margin: 0;
   color: #fff;
+  font-size: 42px;
 }
 
 .close-btn {
   background: none;
   border: none;
-  font-size: 28px;
+  font-size: 48px;
   color: #fff;
   cursor: pointer;
   padding: 0;
-  width: 30px;
-  height: 30px;
+  width: 50px;
+  height: 50px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -150,24 +219,24 @@ body {
 
 .close-btn:hover {
   color: #f5576c;
-  transform: scale(1.1);
+  transform: scale(1.2);
 }
 
 /* 업그레이드 리스트 */
 .upgrade-list {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 20px;
 }
 
 .upgrade-item {
   background: rgba(255, 255, 255, 0.05);
-  padding: 15px;
-  border-radius: 10px;
+  padding: 25px;
+  border-radius: 15px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border: 2px solid transparent;
+  border: 3px solid transparent;
   transition: all 0.3s ease;
 }
 
@@ -181,14 +250,14 @@ body {
 }
 
 .upgrade-info h3 {
-  margin: 0 0 8px 0;
-  font-size: 18px;
+  margin: 0 0 12px 0;
+  font-size: 32px;
   color: #fff;
 }
 
 .upgrade-info p {
-  margin: 4px 0;
-  font-size: 14px;
+  margin: 6px 0;
+  font-size: 24px;
   color: #bbb;
 }
 
@@ -198,52 +267,103 @@ body {
 }
 
 .upgrade-btn {
-  padding: 12px 24px;
-  font-size: 16px;
+  padding: 20px 40px;
+  font-size: 28px;
   font-weight: bold;
   color: #fff;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   border: none;
-  border-radius: 8px;
+  border-radius: 15px;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
   white-space: nowrap;
 }
 
 .upgrade-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+  transform: translateY(-3px);
+  box-shadow: 0 9px 18px rgba(0, 0, 0, 0.5);
 }
 
 .upgrade-btn:active {
   transform: translateY(0);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.4);
 }
 
-/* 반응형 */
-@media (max-width: 768px) {
-  #topBar, #bottomBar {
-    border-radius: 0;
-  }
+/* 설정 리스트 */
+.settings-list {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
 
-  #gameCanvas {
-    border-left: none;
-    border-right: none;
-  }
+.setting-item {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
 
-  .modal-content {
-    width: 95%;
-    padding: 20px;
-  }
+.setting-item label {
+  font-size: 26px;
+  color: #fff;
+  font-weight: bold;
+}
 
-  .upgrade-item {
-    flex-direction: column;
-    gap: 10px;
-    align-items: stretch;
-  }
+.setting-item input {
+  padding: 15px;
+  font-size: 24px;
+  border: 2px solid #667eea;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  outline: none;
+  transition: all 0.3s ease;
+}
 
-  .upgrade-btn {
-    width: 100%;
-  }
+.setting-item input:focus {
+  border-color: #f093fb;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.reset-btn {
+  margin-top: 20px;
+  padding: 20px 40px;
+  font-size: 28px;
+  font-weight: bold;
+  color: #fff;
+  background: linear-gradient(135deg, #f5576c 0%, #f093fb 100%);
+  border: none;
+  border-radius: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+}
+
+.reset-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 9px 18px rgba(0, 0, 0, 0.5);
+}
+
+.reset-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.4);
+}
+
+/* 스크롤바 스타일 */
+.modal-content::-webkit-scrollbar {
+  width: 12px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+  background: #667eea;
+  border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+  background: #764ba2;
 }

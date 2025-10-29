@@ -14,44 +14,61 @@ const UI = {
 
   // UI 모드
   showUpgradeMenu: false,
+  showSettingsMenu: false,
 
   // 초기화
   init(canvas) {
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d');
 
-    // 이벤트 리스너
-    canvas.addEventListener('mousedown', this.onMouseDown.bind(this));
-    canvas.addEventListener('mousemove', this.onMouseMove.bind(this));
-    canvas.addEventListener('mouseup', this.onMouseUp.bind(this));
+    // 이벤트 리스너 - 전역으로 변경 (캔버스 스케일링 대응)
+    document.addEventListener('mousedown', this.onMouseDown.bind(this));
+    document.addEventListener('mousemove', this.onMouseMove.bind(this));
+    document.addEventListener('mouseup', this.onMouseUp.bind(this));
 
     // 터치 이벤트
-    canvas.addEventListener('touchstart', this.onTouchStart.bind(this));
-    canvas.addEventListener('touchmove', this.onTouchMove.bind(this));
-    canvas.addEventListener('touchend', this.onTouchEnd.bind(this));
+    document.addEventListener('touchstart', this.onTouchStart.bind(this), { passive: false });
+    document.addEventListener('touchmove', this.onTouchMove.bind(this), { passive: false });
+    document.addEventListener('touchend', this.onTouchEnd.bind(this), { passive: false });
 
     // 버튼 이벤트
     document.getElementById('gachaBtn').addEventListener('click', this.onGachaClick.bind(this));
     document.getElementById('upgradeBtn').addEventListener('click', this.toggleUpgradeMenu.bind(this));
     document.getElementById('closeUpgradeBtn').addEventListener('click', this.toggleUpgradeMenu.bind(this));
 
+    // 설정 버튼
+    document.getElementById('settingsBtn').addEventListener('click', this.toggleSettingsMenu.bind(this));
+    document.getElementById('closeSettingsBtn').addEventListener('click', this.toggleSettingsMenu.bind(this));
+    document.getElementById('resetSettingsBtn').addEventListener('click', this.resetSettings.bind(this));
+
     // 업그레이드 버튼들
     document.getElementById('upgradeCooldown').addEventListener('click', () => this.onUpgrade('cooldown'));
     document.getElementById('upgradeMoney').addEventListener('click', () => this.onUpgrade('money'));
     document.getElementById('upgradeGacha').addEventListener('click', () => this.onUpgrade('gacha'));
+
+    // 설정 입력 이벤트
+    this.initSettingsInputs();
   },
 
   // 렌더링
   render() {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-    // 배경
-    this.ctx.fillStyle = '#2C3E50';
+    // 전체 배경
+    this.ctx.fillStyle = '#1a1a1a';
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
-    // 게임 영역 배경
-    this.ctx.fillStyle = '#34495E';
-    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height - 150);
+    // 상단바 영역 (100px)
+    this.ctx.fillStyle = '#667eea';
+    this.ctx.fillRect(0, 0, this.canvas.width, 100);
+
+    // 게임 영역 배경 (100px ~ 1720px)
+    this.ctx.fillStyle = '#2C3E50';
+    this.ctx.fillRect(0, 100, this.canvas.width, CONFIG.GAME_AREA_HEIGHT);
+
+    // 하단바 영역 (1720px ~ 1920px)
+    this.ctx.fillStyle = '#667eea';
+    this.ctx.fillRect(0, CONFIG.CANVAS_HEIGHT - 200, this.canvas.width, 200);
 
     // 오브젝트 렌더링
     Game.state.objects.forEach(obj => {
@@ -136,24 +153,47 @@ const UI = {
   // 마우스/터치 이벤트 처리
   getMousePos(e) {
     const rect = this.canvas.getBoundingClientRect();
+    const clientX = e.clientX || (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
+    const clientY = e.clientY || (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
+
+    // 스케일 비율 계산
+    const scaleX = this.canvas.width / rect.width;
+    const scaleY = this.canvas.height / rect.height;
+
     return {
-      x: (e.clientX || e.touches[0].clientX) - rect.left,
-      y: (e.clientY || e.touches[0].clientY) - rect.top
+      x: (clientX - rect.left) * scaleX,
+      y: (clientY - rect.top) * scaleY
     };
   },
 
   findObjectAt(x, y) {
-    return Game.state.objects.find(obj => {
+    // 역순으로 검색 (위에 있는 오브젝트 우선)
+    for (let i = Game.state.objects.length - 1; i >= 0; i--) {
+      const obj = Game.state.objects[i];
       const dist = Math.hypot(obj.x - x, obj.y - y);
-      return dist < CONFIG.OBJECT_SIZE / 2;
-    });
+      if (dist < CONFIG.OBJECT_SIZE / 2) {
+        return obj;
+      }
+    }
+    return null;
   },
 
   onMouseDown(e) {
+    // 캔버스 밖 클릭 무시
+    const rect = this.canvas.getBoundingClientRect();
+    const clientX = e.clientX || (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
+    const clientY = e.clientY || (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
+
+    if (clientX < rect.left || clientX > rect.right ||
+        clientY < rect.top || clientY > rect.bottom) {
+      return;
+    }
+
     const pos = this.getMousePos(e);
     const obj = this.findObjectAt(pos.x, pos.y);
 
     if (obj) {
+      e.preventDefault();
       this.dragState.dragging = true;
       this.dragState.objectId = obj.id;
       this.dragState.offsetX = pos.x - obj.x;
@@ -163,6 +203,7 @@ const UI = {
 
   onMouseMove(e) {
     if (!this.dragState.dragging) return;
+    e.preventDefault();
 
     const pos = this.getMousePos(e);
     const obj = Game.state.objects.find(o => o.id === this.dragState.objectId);
@@ -171,14 +212,18 @@ const UI = {
       obj.x = pos.x - this.dragState.offsetX;
       obj.y = pos.y - this.dragState.offsetY;
 
-      // 캔버스 밖으로 나가지 않도록
-      obj.x = Math.max(CONFIG.OBJECT_SIZE / 2, Math.min(this.canvas.width - CONFIG.OBJECT_SIZE / 2, obj.x));
-      obj.y = Math.max(CONFIG.OBJECT_SIZE / 2, Math.min(this.canvas.height - 150 - CONFIG.OBJECT_SIZE / 2, obj.y));
+      // 게임 영역 안에서만 이동 (상단 100px, 하단 200px 제외)
+      const minY = 100 + CONFIG.OBJECT_SIZE / 2;
+      const maxY = CONFIG.CANVAS_HEIGHT - 200 - CONFIG.OBJECT_SIZE / 2;
+
+      obj.x = Math.max(CONFIG.OBJECT_SIZE / 2, Math.min(CONFIG.CANVAS_WIDTH - CONFIG.OBJECT_SIZE / 2, obj.x));
+      obj.y = Math.max(minY, Math.min(maxY, obj.y));
     }
   },
 
   onMouseUp(e) {
     if (!this.dragState.dragging) return;
+    e.preventDefault();
 
     const obj = Game.state.objects.find(o => o.id === this.dragState.objectId);
     if (obj) {
@@ -229,6 +274,49 @@ const UI = {
       this.renderUpgradeMenu();
     } else {
       alert(result.message);
+    }
+  },
+
+  // 설정 메뉴
+  toggleSettingsMenu() {
+    this.showSettingsMenu = !this.showSettingsMenu;
+    document.getElementById('settingsMenu').style.display = this.showSettingsMenu ? 'block' : 'none';
+
+    if (this.showSettingsMenu) {
+      this.updateSettingsDisplay();
+    }
+  },
+
+  initSettingsInputs() {
+    const settings = ['baseIncome', 'tierMultiplier', 'baseCooldown', 'gachaCost', 'objectSize', 'upgradeCostMultiplier'];
+
+    settings.forEach(key => {
+      const input = document.getElementById(`setting_${key}`);
+      if (input) {
+        input.addEventListener('input', (e) => {
+          const value = parseFloat(e.target.value);
+          if (!isNaN(value) && value > 0) {
+            Settings.set(key, value);
+          }
+        });
+      }
+    });
+  },
+
+  updateSettingsDisplay() {
+    Object.keys(Settings.values).forEach(key => {
+      const input = document.getElementById(`setting_${key}`);
+      if (input) {
+        input.value = Settings.values[key];
+      }
+    });
+  },
+
+  resetSettings() {
+    if (confirm('모든 설정을 초기화하시겠습니까?')) {
+      Settings.reset();
+      this.updateSettingsDisplay();
+      alert('설정이 초기화되었습니다.');
     }
   }
 };

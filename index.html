@@ -10,28 +10,32 @@
 </head>
 <body>
   <div id="gameContainer">
-    <!-- 상단 골드 표시 -->
-    <div id="topBar">
-      <div id="goldDisplay">
-        <span class="gold-icon">💰</span>
-        <span id="goldAmount">0</span>
+    <!-- 고정 비율 게임 박스 -->
+    <div id="gameBox">
+      <!-- 상단바: 골드 + 설정 버튼 -->
+      <div id="topBar">
+        <div id="goldDisplay">
+          <span class="gold-icon">💰</span>
+          <span id="goldAmount">0</span>
+        </div>
+        <button id="settingsBtn" class="icon-btn" title="설정">⚙️</button>
+      </div>
+
+      <!-- 게임 캔버스 (1080x1920) -->
+      <canvas id="gameCanvas"></canvas>
+
+      <!-- 하단바: 뽑기 + 업그레이드 버튼 -->
+      <div id="bottomBar">
+        <button id="gachaBtn" class="game-btn">
+          뽑기 (<span id="gachaCost">50</span>💰)
+        </button>
+        <button id="upgradeBtn" class="game-btn">
+          업그레이드
+        </button>
       </div>
     </div>
 
-    <!-- 게임 캔버스 -->
-    <canvas id="gameCanvas"></canvas>
-
-    <!-- 하단 버튼 -->
-    <div id="bottomBar">
-      <button id="gachaBtn" class="game-btn">
-        뽑기 (<span id="gachaCost">50</span>💰)
-      </button>
-      <button id="upgradeBtn" class="game-btn">
-        업그레이드
-      </button>
-    </div>
-
-    <!-- 업그레이드 메뉴 (팝업) -->
+    <!-- 업그레이드 메뉴 (모달) -->
     <div id="upgradeMenu" class="modal" style="display: none;">
       <div class="modal-content">
         <div class="modal-header">
@@ -75,6 +79,52 @@
               <span id="gachaCost">500</span>💰
             </button>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 설정 메뉴 (모달) -->
+    <div id="settingsMenu" class="modal" style="display: none;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>⚙️ 게임 설정</h2>
+          <button id="closeSettingsBtn" class="close-btn">✕</button>
+        </div>
+
+        <div class="settings-list">
+          <div class="setting-item">
+            <label>기본 수익</label>
+            <input type="number" id="setting_baseIncome" min="1" step="1" value="1">
+          </div>
+
+          <div class="setting-item">
+            <label>등급당 수익 배율</label>
+            <input type="number" id="setting_tierMultiplier" min="1" step="0.1" value="2">
+          </div>
+
+          <div class="setting-item">
+            <label>기본 쿨타임 (ms)</label>
+            <input type="number" id="setting_baseCooldown" min="100" step="100" value="2000">
+          </div>
+
+          <div class="setting-item">
+            <label>뽑기 비용</label>
+            <input type="number" id="setting_gachaCost" min="1" step="10" value="50">
+          </div>
+
+          <div class="setting-item">
+            <label>오브젝트 크기</label>
+            <input type="number" id="setting_objectSize" min="20" step="5" value="80">
+          </div>
+
+          <div class="setting-item">
+            <label>업그레이드 비용 배율</label>
+            <input type="number" id="setting_upgradeCostMultiplier" min="1" step="0.1" value="1.5">
+          </div>
+
+          <button id="resetSettingsBtn" class="reset-btn">
+            초기화
+          </button>
         </div>
       </div>
     </div>
