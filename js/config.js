@@ -90,7 +90,8 @@ const Settings = {
     baseCooldown: 2000,      // 기본 쿨타임 (ms)
     gachaCost: 50,           // 뽑기 비용
     objectSize: 80,          // 오브젝트 크기
-    upgradeCostMultiplier: 1.5 // 업그레이드 비용 배율
+    upgradeCostMultiplier: 1.5, // 업그레이드 비용 배율
+    textScale: 1.0           // 텍스트 크기 배율 (0.5 ~ 2.0)
   },
 
   // 설정 로드
@@ -125,6 +126,11 @@ const Settings = {
     CONFIG.OBJECT_SIZE = this.values.objectSize;
     CONFIG.UPGRADES.COOLDOWN.COST_MULTIPLIER = this.values.upgradeCostMultiplier;
     CONFIG.UPGRADES.MONEY.COST_MULTIPLIER = this.values.upgradeCostMultiplier;
+
+    // CSS 변수 업데이트 (텍스트 스케일)
+    if (typeof document !== 'undefined') {
+      document.documentElement.style.setProperty('--text-scale', this.values.textScale);
+    }
   },
 
   // 설정 값 변경
@@ -144,7 +150,8 @@ const Settings = {
       baseCooldown: 2000,
       gachaCost: 50,
       objectSize: 80,
-      upgradeCostMultiplier: 1.5
+      upgradeCostMultiplier: 1.5,
+      textScale: 1.0
     };
     this.apply();
     this.save();

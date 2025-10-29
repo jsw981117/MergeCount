@@ -120,7 +120,8 @@ const UI = {
 
     // 등급 표시
     this.ctx.fillStyle = '#FFF';
-    this.ctx.font = 'bold 16px Arial';
+    const fontSize = Math.floor(16 * Settings.values.textScale);
+    this.ctx.font = `bold ${fontSize}px Arial`;
     this.ctx.textAlign = 'center';
     this.ctx.textBaseline = 'middle';
     this.ctx.fillText(obj.tier + 1, 0, 0);
@@ -288,7 +289,7 @@ const UI = {
   },
 
   initSettingsInputs() {
-    const settings = ['baseIncome', 'tierMultiplier', 'baseCooldown', 'gachaCost', 'objectSize', 'upgradeCostMultiplier'];
+    const settings = ['baseIncome', 'tierMultiplier', 'baseCooldown', 'gachaCost', 'objectSize', 'upgradeCostMultiplier', 'textScale'];
 
     settings.forEach(key => {
       const input = document.getElementById(`setting_${key}`);

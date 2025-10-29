@@ -1,4 +1,8 @@
 /* 전역 스타일 */
+:root {
+  --text-scale: 1.0; /* 텍스트 크기 배율 (0.5 ~ 2.0) */
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -86,31 +90,33 @@ body {
 }
 
 #goldDisplay {
-  font-size: 48px;
+  font-size: calc(24px * var(--text-scale));
   font-weight: bold;
   text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.8);
   color: #FFD700;
   pointer-events: none;
+  white-space: nowrap;
 }
 
 .gold-icon {
-  margin-right: 10px;
+  margin-right: 5px;
 }
 
 /* 설정 버튼 (아이콘) */
 .icon-btn {
-  font-size: 48px;
+  font-size: calc(24px * var(--text-scale));
   background: rgba(0, 0, 0, 0.5);
   border: 3px solid rgba(255, 255, 255, 0.3);
   border-radius: 50%;
-  width: 80px;
-  height: 80px;
+  width: 80px;  /* 고정 */
+  height: 80px; /* 고정 */
   cursor: pointer;
   transition: all 0.3s ease;
   pointer-events: auto;
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
 }
 
 .icon-btn:hover {
@@ -140,8 +146,10 @@ body {
 
 .game-btn {
   flex: 1;
-  padding: 30px;
-  font-size: 36px;
+  height: 140px; /* 고정 높이 */
+  min-width: 0;
+  padding: 0;
+  font-size: calc(18px * var(--text-scale));
   font-weight: bold;
   color: #fff;
   background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
@@ -150,6 +158,12 @@ body {
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .game-btn:hover {
@@ -199,13 +213,14 @@ body {
 .modal-header h2 {
   margin: 0;
   color: #fff;
-  font-size: 42px;
+  font-size: calc(21px * var(--text-scale));
+  white-space: nowrap;
 }
 
 .close-btn {
   background: none;
   border: none;
-  font-size: 48px;
+  font-size: calc(24px * var(--text-scale));
   color: #fff;
   cursor: pointer;
   padding: 0;
@@ -215,6 +230,7 @@ body {
   align-items: center;
   justify-content: center;
   transition: all 0.2s ease;
+  overflow: hidden;
 }
 
 .close-btn:hover {
@@ -250,15 +266,17 @@ body {
 }
 
 .upgrade-info h3 {
-  margin: 0 0 12px 0;
-  font-size: 32px;
+  margin: 0 0 6px 0;
+  font-size: calc(16px * var(--text-scale));
   color: #fff;
+  white-space: nowrap;
 }
 
 .upgrade-info p {
-  margin: 6px 0;
-  font-size: 24px;
+  margin: 3px 0;
+  font-size: calc(12px * var(--text-scale));
   color: #bbb;
+  white-space: nowrap;
 }
 
 .upgrade-effect {
@@ -267,8 +285,10 @@ body {
 }
 
 .upgrade-btn {
-  padding: 20px 40px;
-  font-size: 28px;
+  padding: 15px 30px;
+  min-width: 120px;
+  height: 60px; /* 고정 높이 */
+  font-size: calc(14px * var(--text-scale));
   font-weight: bold;
   color: #fff;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -278,6 +298,11 @@ body {
   transition: all 0.3s ease;
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .upgrade-btn:hover {
@@ -304,14 +329,16 @@ body {
 }
 
 .setting-item label {
-  font-size: 26px;
+  font-size: calc(13px * var(--text-scale));
   color: #fff;
   font-weight: bold;
+  white-space: nowrap;
 }
 
 .setting-item input {
-  padding: 15px;
-  font-size: 24px;
+  padding: 12px;
+  height: 50px; /* 고정 높이 */
+  font-size: calc(12px * var(--text-scale));
   border: 2px solid #667eea;
   border-radius: 10px;
   background: rgba(255, 255, 255, 0.1);
@@ -327,8 +354,9 @@ body {
 
 .reset-btn {
   margin-top: 20px;
-  padding: 20px 40px;
-  font-size: 28px;
+  padding: 0;
+  height: 60px; /* 고정 높이 */
+  font-size: calc(14px * var(--text-scale));
   font-weight: bold;
   color: #fff;
   background: linear-gradient(135deg, #f5576c 0%, #f093fb 100%);
@@ -337,6 +365,12 @@ body {
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .reset-btn:hover {
