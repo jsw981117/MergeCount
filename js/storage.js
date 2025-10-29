@@ -38,9 +38,25 @@ const Storage = {
       const offlineTime = Date.now() - saveData.lastSaveTime;
       const offlineIncome = this.calculateOfflineIncome(saveData, offlineTime);
 
+      // 위치 경계값 계산
+      const minY = 100 + CONFIG.OBJECT_SIZE / 2;
+      const maxY = CONFIG.CANVAS_HEIGHT - 200 - CONFIG.OBJECT_SIZE / 2;
+      const minX = CONFIG.OBJECT_SIZE / 2;
+      const maxX = CONFIG.CANVAS_WIDTH - CONFIG.OBJECT_SIZE / 2;
+
       return {
         gold: saveData.gold + offlineIncome,
-        objects: saveData.objects,
+        objects: saveData.objects.map(obj => ({
+          ...obj,
+          // 위치 유효성 검증
+          x: Math.max(minX, Math.min(maxX, obj.x || minX)),
+          y: Math.max(minY, Math.min(maxY, obj.y || minY)),
+          // 물리 속성 추가
+          vx: 0,
+          vy: 0,
+          sleeping: false,
+          lastIncome: Date.now()
+        })),
         upgrades: saveData.upgrades,
         offlineIncome: offlineIncome
       };

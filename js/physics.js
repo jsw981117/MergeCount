@@ -87,7 +87,24 @@ const Physics = {
     const grid = this.buildSpatialHash();
     const checked = new Set();
 
+    // 드래그 중인 오브젝트 확인
+    const draggedObj = UI.dragState.dragging
+      ? Game.state.objects.find(o => o.id === UI.dragState.objectId)
+      : null;
+
+    // 드래그 충돌 처리 (일방향)
+    if (draggedObj) {
+      Game.state.objects.forEach(obj => {
+        if (obj.id !== draggedObj.id) {
+          this.handleDragCollision(draggedObj, obj);
+        }
+      });
+    }
+
+    // 일반 물리 충돌
     Game.state.objects.forEach(obj => {
+      // 드래그 중인 오브젝트는 일반 물리 제외
+      if (draggedObj && obj.id === draggedObj.id) return;
       if (obj.sleeping) return;
 
       const cellX = Math.floor(obj.x / this.CELL_SIZE);
@@ -100,6 +117,8 @@ const Physics = {
           const neighbors = grid[key] || [];
 
           neighbors.forEach(other => {
+            // 드래그 중인 오브젝트는 일반 물리 제외
+            if (draggedObj && other.id === draggedObj.id) return;
             if (obj.id >= other.id) return; // 중복 체크 방지
 
             const pairKey = `${obj.id},${other.id}`;
@@ -154,6 +173,47 @@ const Physics = {
       // 슬립 해제
       obj1.sleeping = false;
       obj2.sleeping = false;
+    }
+  },
+
+  // 드래그 충돌 처리 (일방향)
+  handleDragCollision(draggedObj, other) {
+    const dx = other.x - draggedObj.x;
+    const dy = other.y - draggedObj.y;
+    const dist = Math.hypot(dx, dy);
+    const minDist = CONFIG.OBJECT_SIZE;
+
+    if (dist < minDist && dist > 0) {
+      // 같은 등급 → 머지
+      if (draggedObj.tier === other.tier) {
+        Game.merge(draggedObj, other);
+        UI.dragState.dragging = false;
+        UI.dragState.objectId = null;
+        return;
+      }
+
+      // 다른 등급 → 밀어내기
+      const overlap = minDist - dist;
+      const angle = Math.atan2(dy, dx);
+
+      // 상대 오브젝트만 밀어냄
+      other.x += Math.cos(angle) * overlap;
+      other.y += Math.sin(angle) * overlap;
+
+      // 상대 오브젝트에 속도 부여
+      const pushForce = 200;
+      other.vx += Math.cos(angle) * pushForce;
+      other.vy += Math.sin(angle) * pushForce;
+
+      // 최대 속도 제한
+      const speed = Math.hypot(other.vx, other.vy);
+      if (speed > this.MAX_SPEED) {
+        other.vx = (other.vx / speed) * this.MAX_SPEED;
+        other.vy = (other.vy / speed) * this.MAX_SPEED;
+      }
+
+      // 슬립 해제
+      other.sleeping = false;
     }
   },
 

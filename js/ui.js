@@ -231,6 +231,11 @@ const UI = {
       obj.x = Math.max(CONFIG.OBJECT_SIZE / 2, Math.min(CONFIG.CANVAS_WIDTH - CONFIG.OBJECT_SIZE / 2, obj.x));
       obj.y = Math.max(minY, Math.min(maxY, obj.y));
 
+      // 속도 계산을 위한 위치 추적
+      this.dragState.lastX = pos.x;
+      this.dragState.lastY = pos.y;
+      this.dragState.lastTime = Date.now();
+
       // 드래그 중 머지 체크
       const target = Physics.checkDragCollision(obj);
       if (target) {
