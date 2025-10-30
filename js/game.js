@@ -47,6 +47,33 @@ const Game = {
       y = Math.random() * (CONFIG.CANVAS_HEIGHT - 200 - CONFIG.OBJECT_SIZE * 2) + CONFIG.OBJECT_SIZE;
     }
 
+    // 소환 위치 근처의 오브젝트 밀어내기
+    const pushRadius = CONFIG.OBJECT_SIZE * 0.8; // 충돌 감지 범위
+    this.state.objects.forEach(existingObj => {
+      const dx = existingObj.x - x;
+      const dy = existingObj.y - y;
+      const dist = Math.hypot(dx, dy);
+
+      if (dist < pushRadius && dist > 0) {
+        // 밀어내기
+        const angle = Math.atan2(dy, dx);
+        const pushForce = 400; // 밀어내는 힘
+
+        existingObj.vx += Math.cos(angle) * pushForce;
+        existingObj.vy += Math.sin(angle) * pushForce;
+
+        // 최대 속도 제한 (Physics.MAX_SPEED와 동일)
+        const speed = Math.hypot(existingObj.vx, existingObj.vy);
+        const maxSpeed = 800;
+        if (speed > maxSpeed) {
+          existingObj.vx = (existingObj.vx / speed) * maxSpeed;
+          existingObj.vy = (existingObj.vy / speed) * maxSpeed;
+        }
+
+        existingObj.sleeping = false;
+      }
+    });
+
     const obj = {
       id: this.nextObjectId++,
       tier: tier,

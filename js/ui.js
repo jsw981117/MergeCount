@@ -15,6 +15,14 @@ const UI = {
     lastTime: 0
   },
 
+  // 홀드 상태 (뽑기 버튼 꾹 누르기)
+  holdState: {
+    isHolding: false,
+    timerId: null,
+    startTime: 0,
+    currentInterval: 500 // 초기 간격 500ms
+  },
+
   // UI 모드
   showUpgradeMenu: false,
   showSettingsMenu: false,
@@ -35,7 +43,13 @@ const UI = {
     document.addEventListener('touchend', this.onTouchEnd.bind(this), { passive: false });
 
     // 버튼 이벤트
-    document.getElementById('gachaBtn').addEventListener('click', this.onGachaClick.bind(this));
+    const gachaBtn = document.getElementById('gachaBtn');
+    gachaBtn.addEventListener('mousedown', this.onGachaDown.bind(this));
+    gachaBtn.addEventListener('touchstart', this.onGachaDown.bind(this), { passive: false });
+    gachaBtn.addEventListener('mouseup', this.onGachaUp.bind(this));
+    gachaBtn.addEventListener('touchend', this.onGachaUp.bind(this));
+    gachaBtn.addEventListener('mouseleave', this.onGachaUp.bind(this));
+
     document.getElementById('upgradeBtn').addEventListener('click', this.toggleUpgradeMenu.bind(this));
     document.getElementById('closeUpgradeBtn').addEventListener('click', this.toggleUpgradeMenu.bind(this));
 
@@ -300,6 +314,53 @@ const UI = {
     } else {
       alert(result.message);
     }
+  },
+
+  // 뽑기 버튼 꾹 누르기 시작
+  onGachaDown(e) {
+    e.preventDefault();
+
+    // 즉시 1회 실행
+    this.onGachaClick();
+
+    // 홀드 상태 초기화
+    this.holdState.isHolding = true;
+    this.holdState.startTime = Date.now();
+    this.holdState.currentInterval = 500;
+
+    // 재귀 타이머 시작
+    this.scheduleNextGacha();
+  },
+
+  // 뽑기 버튼 떼기
+  onGachaUp(e) {
+    if (e) e.preventDefault();
+
+    this.holdState.isHolding = false;
+    if (this.holdState.timerId) {
+      clearTimeout(this.holdState.timerId);
+      this.holdState.timerId = null;
+    }
+  },
+
+  // 다음 뽑기 예약 (재귀)
+  scheduleNextGacha() {
+    if (!this.holdState.isHolding) return;
+
+    this.holdState.timerId = setTimeout(() => {
+      if (!this.holdState.isHolding) return;
+
+      // 뽑기 실행
+      this.onGachaClick();
+
+      // 간격 감소 (1초당 50ms 감소, 최소 100ms)
+      const elapsed = Date.now() - this.holdState.startTime;
+      const reduction = Math.floor(elapsed / 1000) * 50;
+      this.holdState.currentInterval = Math.max(100, 500 - reduction);
+
+      // 다음 실행 예약
+      this.scheduleNextGacha();
+    }, this.holdState.currentInterval);
   },
 
   toggleUpgradeMenu() {
