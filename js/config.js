@@ -91,7 +91,10 @@ const Settings = {
     gachaCost: 50,           // 뽑기 비용
     objectSize: 150,         // 오브젝트 크기
     upgradeCostMultiplier: 1.5, // 업그레이드 비용 배율
-    textScale: 1.0           // 텍스트 크기 배율 (0.5 ~ 2.0)
+    textScale: 1.0,          // 텍스트 크기 배율 (0.5 ~ 2.0)
+    holdIntervalStart: 500,  // 버튼 홀드 시작 간격 (ms)
+    holdIntervalMin: 100,    // 버튼 홀드 최소 간격 (ms)
+    holdIntervalReduction: 50 // 버튼 홀드 1초당 감소량 (ms)
   },
 
   // 설정 로드
@@ -151,7 +154,10 @@ const Settings = {
       gachaCost: 50,
       objectSize: 150,
       upgradeCostMultiplier: 1.5,
-      textScale: 1.0
+      textScale: 1.0,
+      holdIntervalStart: 500,
+      holdIntervalMin: 100,
+      holdIntervalReduction: 50
     };
     this.apply();
     this.save();

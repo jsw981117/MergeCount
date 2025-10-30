@@ -20,7 +20,7 @@ const UI = {
     isHolding: false,
     timerId: null,
     startTime: 0,
-    currentInterval: 500 // 초기 간격 500ms
+    currentInterval: 0 // Settings에서 가져옴
   },
 
   // UI 모드
@@ -326,7 +326,7 @@ const UI = {
     // 홀드 상태 초기화
     this.holdState.isHolding = true;
     this.holdState.startTime = Date.now();
-    this.holdState.currentInterval = 500;
+    this.holdState.currentInterval = Settings.values.holdIntervalStart;
 
     // 재귀 타이머 시작
     this.scheduleNextGacha();
@@ -353,10 +353,13 @@ const UI = {
       // 뽑기 실행
       this.onGachaClick();
 
-      // 간격 감소 (1초당 50ms 감소, 최소 100ms)
+      // 간격 감소 (설정값 사용)
       const elapsed = Date.now() - this.holdState.startTime;
-      const reduction = Math.floor(elapsed / 1000) * 50;
-      this.holdState.currentInterval = Math.max(100, 500 - reduction);
+      const reduction = Math.floor(elapsed / 1000) * Settings.values.holdIntervalReduction;
+      this.holdState.currentInterval = Math.max(
+        Settings.values.holdIntervalMin,
+        Settings.values.holdIntervalStart - reduction
+      );
 
       // 다음 실행 예약
       this.scheduleNextGacha();
@@ -389,7 +392,7 @@ const UI = {
   },
 
   initSettingsInputs() {
-    const settings = ['baseIncome', 'tierMultiplier', 'baseCooldown', 'gachaCost', 'objectSize', 'upgradeCostMultiplier', 'textScale'];
+    const settings = ['baseIncome', 'tierMultiplier', 'baseCooldown', 'gachaCost', 'objectSize', 'upgradeCostMultiplier', 'textScale', 'holdIntervalStart', 'holdIntervalMin', 'holdIntervalReduction'];
 
     settings.forEach(key => {
       const input = document.getElementById(`setting_${key}`);

@@ -2,14 +2,24 @@
 
 const Physics = {
   // 물리 상수
-  MAX_SPEED: 500,        // 최대 속도 (px/s)
+  MAX_SPEED: 600,        // 최대 속도 (px/s)
   FRICTION: 0.98,        // 마찰 계수
   RESTITUTION: 0.5,      // 반발 계수
   SLEEP_THRESHOLD: 0.5,  // 정지 판정 임계값
   CELL_SIZE: 150,        // 공간 분할 셀 크기
+  SUBSTEPS: 2,           // 물리 서브스텝 (tunneling 방지)
 
-  // 물리 업데이트
+  // 물리 업데이트 (서브스텝 적용)
   update(deltaTime) {
+    const subDt = deltaTime / this.SUBSTEPS;
+
+    for (let i = 0; i < this.SUBSTEPS; i++) {
+      this.updatePhysics(subDt);
+    }
+  },
+
+  // 실제 물리 계산
+  updatePhysics(deltaTime) {
     const dt = deltaTime / 1000; // ms → s
 
     // 1. 속도 적용 + 마찰
@@ -23,6 +33,9 @@ const Physics = {
       // 마찰력
       obj.vx *= this.FRICTION;
       obj.vy *= this.FRICTION;
+
+      // 속도 제한
+      this.applyVelocityLimit(obj);
 
       // 정지 체크
       if (Math.abs(obj.vx) < this.SLEEP_THRESHOLD &&
@@ -38,6 +51,16 @@ const Physics = {
 
     // 2. 오브젝트 간 충돌
     this.checkCollisions();
+  },
+
+  // 속도 제한 적용
+  applyVelocityLimit(obj) {
+    const speed = Math.hypot(obj.vx, obj.vy);
+    if (speed > this.MAX_SPEED) {
+      const scale = this.MAX_SPEED / speed;
+      obj.vx *= scale;
+      obj.vy *= scale;
+    }
   },
 
   // 벽 충돌
@@ -137,7 +160,7 @@ const Physics = {
     const dx = obj2.x - obj1.x;
     const dy = obj2.y - obj1.y;
     const dist = Math.hypot(dx, dy);
-    const minDist = CONFIG.OBJECT_SIZE;
+    const minDist = CONFIG.OBJECT_SIZE * 1.02; // 2% 여유
 
     if (dist < minDist && dist > 0) {
       // 같은 등급 → 머지
@@ -181,7 +204,7 @@ const Physics = {
     const dx = other.x - draggedObj.x;
     const dy = other.y - draggedObj.y;
     const dist = Math.hypot(dx, dy);
-    const minDist = CONFIG.OBJECT_SIZE;
+    const minDist = CONFIG.OBJECT_SIZE * 1.02; // 2% 여유
 
     if (dist < minDist && dist > 0) {
       // 같은 등급 → 머지
@@ -224,7 +247,7 @@ const Physics = {
       if (obj.tier !== draggedObj.tier) return false;
 
       const dist = Math.hypot(obj.x - draggedObj.x, obj.y - draggedObj.y);
-      return dist < CONFIG.OBJECT_SIZE;
+      return dist < CONFIG.OBJECT_SIZE * 1.02; // 2% 여유
     });
   }
 };

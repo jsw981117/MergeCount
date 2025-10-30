@@ -62,12 +62,11 @@ const Game = {
         existingObj.vx += Math.cos(angle) * pushForce;
         existingObj.vy += Math.sin(angle) * pushForce;
 
-        // 최대 속도 제한 (Physics.MAX_SPEED와 동일)
+        // 최대 속도 제한
         const speed = Math.hypot(existingObj.vx, existingObj.vy);
-        const maxSpeed = 800;
-        if (speed > maxSpeed) {
-          existingObj.vx = (existingObj.vx / speed) * maxSpeed;
-          existingObj.vy = (existingObj.vy / speed) * maxSpeed;
+        if (speed > Physics.MAX_SPEED) {
+          existingObj.vx = (existingObj.vx / speed) * Physics.MAX_SPEED;
+          existingObj.vy = (existingObj.vy / speed) * Physics.MAX_SPEED;
         }
 
         existingObj.sleeping = false;
